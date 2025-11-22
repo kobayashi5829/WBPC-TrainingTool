@@ -1,0 +1,41 @@
+import os
+import time
+from openai import OpenAI
+from dotenv import load_dotenv
+
+def main():
+    # .envファイルを読み込む
+    load_dotenv()
+
+    # API設定
+    client = OpenAI(api_key=os.getenv('API_KEY'))
+
+    # データセットをアップロードする
+    training_file = client.files.create(
+        file=open("dataset.jsonl", "rb"),
+        purpose="fine-tune"
+    )
+
+    # ファインチューニングジョブを作成
+    job = client.fine_tuning.jobs.create(
+        training_file=training_file.id,
+        model="gpt-4.1-mini-2025-04-14",
+        hyperparameters={
+            "n_epochs": 3, # 学習回数（3が推奨）
+        }
+    )
+
+    # ジョブの待機
+    print(f"status : {job.status}")
+    while True:
+        job = client.fine_tuning.jobs.retrieve(job.id)
+        print(f"status : {job.status}")
+        if job.status == "succeeded":
+            print(f"status : {job.status}")
+            break
+        time.sleep(60)
+
+    print(f"model name : {job.fine_tuned_model}")
+
+if __name__ == "__main__":
+    main()
