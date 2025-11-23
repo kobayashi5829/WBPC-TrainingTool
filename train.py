@@ -2,6 +2,7 @@ import os
 import time
 from openai import OpenAI
 from dotenv import load_dotenv
+from datetime import datetime
 
 def main():
     # .envファイルを読み込む
@@ -29,12 +30,12 @@ def main():
     # ジョブの待機
     while True:
         job = client.fine_tuning.jobs.retrieve(job.id)
-        print(f"status : {job.status}")
+        print(f"{datetime.now()} {job.status}")
         if job.status == "succeeded":
-            print(f"status : {job.status}")
+            print(f"{datetime.now()} {job.status}")
             break
         elif job.status == "failed":
-            print(f"status : {job.status}")
+            print(f"{datetime.now()} {job.status}")
             break
         time.sleep(60)
 
