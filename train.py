@@ -13,7 +13,8 @@ def main():
     # データセットをアップロードする
     training_file = client.files.create(
         file=open("dataset.jsonl", "rb"),
-        purpose="fine-tune"
+        purpose="fine-tune",
+        expires_after=2592000 # 1か月後に削除
     )
 
     # ファインチューニングジョブを作成
@@ -26,11 +27,13 @@ def main():
     )
 
     # ジョブの待機
-    print(f"status : {job.status}")
     while True:
         job = client.fine_tuning.jobs.retrieve(job.id)
         print(f"status : {job.status}")
         if job.status == "succeeded":
+            print(f"status : {job.status}")
+            break
+        elif job.status == "failed":
             print(f"status : {job.status}")
             break
         time.sleep(60)
