@@ -24,8 +24,6 @@ def main(args):
         for i, line in enumerate(f):
             document_text += f"{i+1}: {line}"
 
-    print(document_text)
-
     # クエリ
     messages = [
         {
