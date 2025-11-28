@@ -1,0 +1,182 @@
+\section{研究目的}
+本研究では指定避難所である徳島北高の災害時の混雑状況をVRで可視化し，徳島北高関係者（在学生，教員）が行政指定の収容人数などについてどのように考えるのかをアンケート調査する．
+
+本研究の対象である徳島北高\footnote{徳島県立徳島北高等学校は，徳島県徳島市応神町にある公立高校である}は2章でも述べた通り，徳島県の指定避難所として登録されており，最大収容人数は4,988人となっている．
+関係者からは学校にそれほどの人数は収容できそうにないなどの懸念や，収容した際の環境を想像できないなどの声が上がっている．
+この疑問を解決するためにVRを用いた災害時の状況の可視化を行う．
+VRで避難時の混雑状況を可視化することで，人的資源の配置や時間軸に沿った避難所運営の計画を議論する際の有益な参考資料になると期待される．
+また，一人称視点によって現実に近い形での体験を提供することにより，避難生活において生じる地域住民の不安や懸念を事前に把握でき，その払拭に円滑に着手できるとも考えられる．　
+
+\section{使用デバイス}
+Meta Quest2はMeta Platforms,Inc.が開発したスタンドアロン型VRである(図3.1)．
+VR上での操作は，付属のコントローラーにて行う．
+本体総重量503gと他のスタンドアロン型VRに比べ比較的軽く，ディスプレイ解像度も片目当たり1,832×1920ピクセルと高くなっており，リフレッシュレートも90Hzまでサポートしているので，現実に近い描画が可能となっている．
+処理速度は従来機種(Meta Quest)の2倍を実現しており，高性能PCには劣るものの高負荷には耐えられるデバイスである．
+更にはMeta Quest Link対応ケーブルを別途用意することで，据え置き型のように外部PCでのVR映像再生も可能である．
+以上の利点から，本研究では，Meta Quest2でVRデバイスとして採用し，開発を進める．
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=12cm]{figures/chapter03/image3-1.png}
+  \caption{Meta Quest2及び付属デバイス}
+\end{figure}
+
+\section{使用ソフトウェア}
+\subsection{Meta Quest Link}
+Meta Quest Linkは先程述べたMeta Quest2とPCを接続するためにMeta Platforms, Inc.が提供しているアプリケーションツールである．
+このツールを通じてHMDをPCへ接続することで，VRデバイスを介してPCを操作可能となる．
+
+\subsection{Unity}
+Unityは統合開発環境を内蔵し，複数のプラットフォームに対応したゲームエンジンである．
+Unityを使用する場合，C\#を用いてのプログラミングが可能である．
+また，UnityにはPackage Managerというライブラリインストールツールがあり，今回のシステム開発ではOpenXR Plugin\footnote{UnityでのVR開発の際に用いられる．}などのライブラリを使用している．
+さらにAsset Storeでは3Dモデルなどの素材が公開されており，今回のシステムでもAsset Storeから低コストな3Dモデルを使用している．
+
+\subsection{Sketch Up}
+Sketch Upは建築モデルを設計するアプリケーションツールであり，直感的な操作性による建築モデリングが可能である．
+本研究では，学校の3DモデルをSketch Up Free（ブラウザ上で動作する無料版）で設計した．
+
+\section{システム構成}
+本研究では，混雑状況疑似体験VRを没入型VRシステム（以下，本システム）として開発した．
+本システムでは，被災者を収容した際の避難所の様子をVRで再現する．
+以下で，建物3Dモデルとシステムの主要機能を説明する．
+
+\subsection{建物3Dモデル}
+実験で使用する徳島北高の3DモデルをSketch Upを用いて作成した（図3.2）．津波災害時には1階が浸水すると想定されているため，以下の区域が避難区域として設定されている\footnote{今回の実験にはクラブハウスを含んでいない．}．また，生徒が登校している場合，普通教室は解放しない方針である．
+
+\begin{itemize}
+  \item 体育館2階アリーナ
+  \item 2階～3階普通教室・廊下
+  \item 2階西側廊下
+  \item クラブハウス2階廊下
+\end{itemize}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=12cm]{figures/chapter03/image3-5.png}    
+  \caption{徳島北高3Dモデルの一部（体育館棟）}
+\end{figure}
+
+\subsection{教室設定機能}
+VRシミュレーション中でのNPCの種類，一人当たりの面積，配置の有無，などを各教室ごとに設定できるような機能を実装した（図3.3）．徳島北高では避難所として運用された際に教室により生徒，一般人，立入禁止のフロアに分かれるような方針を想定している．したがって，各教室ごとにStudent（生徒），People（一般人）Empty（立ち入り禁止）の教室タグを設定できるように実装を行った．教室タグを設定することで配置するNPCの変更が可能であり，Emptyタグを設定するとNPCを配置しない設定が可能である．NPCの種類を図3.4，3.5に示す．また，UI上の更新ボタンを押すことで現状の面積比での全体収容人数の算出も可能である．
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=12cm]{figures/chapter03/image3-6.png}
+  \caption{教室設定画面}
+\end{figure}
+
+\begin{figure}[H]
+  \begin{tabular}{cc}
+    \begin{minipage}[t]{0.45\hsize}
+      \centering
+      \includegraphics[width=4cm]{figures/chapter03/image3-7.png}
+      \caption{StudentタグのNPC（生徒）}
+    \end{minipage}&
+    \begin{minipage}[t]{0.45\hsize}
+      \centering
+      \includegraphics[width=6cm]{figures/chapter03/image3-8.png}
+      \caption{PeopleタグのNPC（一般人）}
+    \end{minipage}
+  \end{tabular}
+\end{figure}
+
+また，教室設定機能では区画内の一人当たり面積の設定も可能である．ここで設定した面積比はVR上に反映される（図3.6，3.7）．
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=12cm]{figures/chapter03/image3-9.png}
+  \caption{体育館アリーナ（約2,500人）}
+\end{figure}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=12cm]{figures/chapter03/image3-10.png}
+  \caption{体育館アリーナ（約1,000人）}
+\end{figure}
+
+%＞これは一人当たり面積が1*1mという意味です．説明不足でした．
+\subsection{設定ファイル管理}
+csv，txtファイルを読み込み，施設全体の情報設定を行うインポート機能や，現在の設定情報をcsv，txtファイルとして出力するエクスポート機能を実装した．これにより，さまざまな種類のシミュレーション設定を管理することが可能である．この設定ファイルでは教室ID，教室名，教室タグ，一人当たり面積の縦横の長さを記録されており，縦横の長さは$\mathrm{m}$単位である．以下にファイルの例を示す．
+
+\begin{screen}
+  \begin{center}
+    \begin{table}[H]
+      \centering
+      \begin{tabular}{|c|c|c|c|c|} \hline
+        ClassRoom101 & 101教室 & Student & 1 & 1 \\ \hline
+      \end{tabular}
+    \end{table}
+  \end{center}
+  \begin{description}
+    \item[\ovalbox{ClassRoom101}] システム上で部屋に割り振る一意なID
+    \item[\ovalbox{101教室}] 部屋名
+    \item[\ovalbox{Student}] 教室タグ
+    \item[\ovalbox{1}] 一人当たり面積の縦の長さ（m）
+    \item[\ovalbox{1}] 一人当たり面積の横の長さ（m）
+  \end{description}
+\end{screen}
+
+\subsection{NPC制御}
+シミュレーション内では避難者NPCが避難所に収容されている．シーン開始時に各教室にはスポーン用のPlaneオブジェクトが配置されており（図3.8），前述した教室設定機能で設定した面積間隔でPlane上にNPCが配置されていく．また，NPCはいくつかの種類があり，生徒は2種類，一般人は13種類のアバタを用意している．
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=12cm]{figures/chapter03/image3-12.png}
+  \caption{NPCスポーン用オブジェクト}
+\end{figure}
+
+NPCのビジュアルには負荷軽減のためローポリアセットであるLow Poly Animated People\footnote{ポリゴン数が少ないアバタを内包するUnityアセット}を使用している．各NPCには固定の音声データを追加することで避難所の騒々しさも表現している．また，ランダム時間経過後に移動と回転を行うように設計されている．
+
+\subsection{オブジェクト最適化}
+本システムでは行政で規定されている最大収容人数との比較をするために少なくとも5000人のNPCをシミュレーション内で生成する必要がある．しかし，それは5000個の動的オブジェクトを一度に管理することを意味しており，PCに相当な負荷をかけるためパフォーマンスが低下すると考える．そこでシミュレーション中でオブジェクトの制御を行う実装方法を採用した．制御方法にはUnityのObject Pooling機能と八分木空間分割\cite{17}の併用を採用し，プレイヤーの周辺9ブロック内のオブジェクトだけを演算，描画するように実装している．\par
+八分木とは木構造の一種であり，3次元空間を8つの空間に分割する手法である．これを用いることで，空間へのアクセスをO(1)で行うことが可能である\footnote{O(1)とは情報処理分野で用いられるアルゴリズム処理時間の評価値}．本システムでは八分木空間法を使用するために，シーン上に建物オブジェクトを含んだ空間をMorton空間として定義した．このMorton空間を分割することで，八分木空間分割法によるオブジェクトの最適化が行える（図3.9）．本システムでは，プレイヤー近辺のオブジェクトを呼び出す際にプレイヤーの空間IDを検索し，周りの空間リストに格納されているオブジェクトを呼び出すことで最適化を図っている．ここでは大まかな空間IDの取得方法を以下に示す．
+
+\begin{enumerate}
+  \item Unity座標系から定義したMorton空間座標系への変換を行う．
+  \item Morton空間上のxyzをbit分割し，bitシフトした値を合算する．
+  \item 算出されたbit値を数値に直す（空間ID）．
+\end{enumerate}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=12cm]{figures/chapter03/image3-13.png}
+  \caption{z=0で空間を分割した様子}
+\end{figure}
+
+また，UnityにはObject Pooling機能が存在し，本システムでも八分木空間分割法に併用して最適化を図っている．Object Poolingとは，予めオブジェクトを登録するディクショナリを作り，オブジェクトが生成される際にディクショナリに同じオブジェクトがあればそれを再利用することができる機能である．Unityのオブジェクト生成及び削除処理には時間を要するので，処理時間の削減にObject Pooling機能は有用である．
+
+\subsection{浸水システム}
+徳島北高周辺では津波災害が懸念されており，同高校は津波緊急避難場所にも指定されている．実験では1階を浸水で使えない設定にしているため，NPCを配置せず浸水表現を使用した（図3.10）．
+
+\begin{figure}
+  \centering
+  \includegraphics[width=12cm]{figures/chapter03/flooding.png}
+  \caption{VR内での浸水表現}
+\end{figure}
+
+\section{システムフロー}
+システムの一連の流れを説明する．
+
+\begin{enumerate}
+  \item 当該Unityアプリを起動する．
+  \item 起動後，タイトルシーンが表示される（図3.11）．VRボタンを押すと避難所体験VRへ遷移する．また，PCボタンを押すとディスプレイとキーボードを用いた操作も可能である．
+
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=12cm]{figures/chapter03/image3-2.png}
+    \caption{タイトルシーン}
+  \end{figure}
+
+  \item 遷移するとVR体験が開始し，マップ上をコントローラーで移動する（図3.12）．図3.12の上部画像は，廊下（people領域）に滞在している一般人を示しており，立っているか座っているかをランダムに選択し，アバタのポーズに反映させている．図3.12の下部画像は，生徒しか入れない教室（student領域）を示しており，アバタはたったポーズで統一している．
+  
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=12cm]{figures/chapter03/image3-3.png}
+  \end{figure}
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=12cm]{figures/chapter03/image3-4.png}
+    \caption{VR体験}
+  \end{figure}
+  
+\end{enumerate}

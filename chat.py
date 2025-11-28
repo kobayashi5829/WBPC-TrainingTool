@@ -18,15 +18,23 @@ def main(args):
     )
 
     if file_path == '': return
+    document_text = ""
     print("document : " + os.path.basename(file_path))
     with open(file_path, "r", encoding="utf-8") as f:
-        document_text = f.read()
+        for i, line in enumerate(f):
+            document_text += f"{i+1}: {line}"
+
+    print(document_text)
 
     # クエリ
     messages = [
         {
             "role": "system",
-            "content": "あなたは論文を添削する先生です。入力したLatex文章を添削してください。"
+            "content": f"""
+                あなたは論文を添削する先生です。
+                入力したLatex文章を添削してください。
+                その際に行番号と添削アドバイスを提示してください。
+            """
         },
         {
             "role": "user",
@@ -34,14 +42,49 @@ def main(args):
         }
     ]
 
+    # フォーマット
+    format = {
+        "type": "json_schema",
+        "json_schema": {
+            "name": "document_advice_response",
+            "strict": True,
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "advices": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "row": {
+                                    "type": "integer"
+                                },
+                                "content": {
+                                    "type": "string" 
+                                },
+                            },
+                            "required": [
+                                "row",
+                                "content",
+                            ],
+                            "additionalProperties": False,
+                        },
+                    },
+                },
+                "required": ["advices"],
+                "additionalProperties": False,
+            },
+        },
+    }
+
     # 添削してもらう
     if args[1] is None: return
     response = client.chat.completions.create(
         model=args[1],
+        response_format=format,
         messages=messages
     )
 
-    print("answer : ")
     print(response.choices[0].message.content)
 
 if __name__ == "__main__":
